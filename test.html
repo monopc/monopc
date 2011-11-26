@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head><title></title></head>
+<body>
+<a href="http://src.gnu-darwin.org/ports/games/monopd/work/monopd-0.9.3/API">http://src.gnu-darwin.org/ports/games/monopd/work/monopd-0.9.3/API</a>
+<form id="foo">
+        <input type="text" id="q" name="fooq" />
+        <input  id="send" type="submit" value="send" />
+</form>
+<pre id="log"></pre>
+
+<script src="http://127.0.0.1:1337/socket.io/socket.io.js"></script>
+<script src="./jquery-1.7.min.js"></script>
+<script>
+document.getElementById("foo").onsubmit = function() {
+        send(document.getElementById("q").value);
+        document.getElementById("q").value = "";
+        return false;
+}
+//global variables
+var buffer = ""; //collects incomplete anwsers until they form a complete one
+
+//Browserdpendend functions
+
+//convert xml to DOM
+//FIXME: Does not work with Internet Explorer.
+//TODO: Check whether new DOMParser(); is possible and define xml2dom different if not
+var xml2dom = function(xmlstring){
+        var parser = new DOMParser();
+        return parser.parseFromString(xmlstring, "text/xml");
+};
+
+function handlemessage(data) {
+        //split the received message into lines
+        var messagelines = data.split("\n");
+        var from, to; //Start- and End- Positions of <monopd>…</monopd> in buffer 
+        //walk trough the lines
+        for(var i=0;i<messagelines.length;++i){
+                if(messagelines[i] != ""){
+                        //ignore empty lines (happens at the end of a monopd-replay as they end with \n)
+                        if(messagelines[i].indexOf("<monopd>") == -1 || messagelines[i].indexOf("</monopd>") == -1){
+                                //the line does not contain a full <monopd>…</monopd>, so write it to a buffer!
+                                buffer = buffer + messagelines[i];
+                                //ToDo: check for a full <monopd>…</monopd>, pass it to handlexml and remove it from the buffer
+                                from = buffer.indexOf("<monopd>");
+                                to = buffer.indexOf("</monopd>");
+                                if(from != -1 && to != -1){
+                                        //Fragments have been written to the buffer
+                                        //There is now an full anwser on the buffer!
+                                        to = to + 9; //don't point at the beginning of </monopd> but after its end
+                                        //alert("something on the buffer. buffer:" + buffer + " from: " + from + " to: " + to);
+                                        //alert("following was completely on the buffer: " + buffer.substring(from, to));
+                                        handlexml(buffer.substring(from, to)); //give the complete <monopd>…</monopd> to handlexml
+                                        buffer = buffer.substring(0, from) + buffer.substring(to); //remove the complete <monopd>…</monopd> from the buffer
+                                }
+                        }else{
+                                //directly give the complete anwser to handlexml
+                                handlexml(messagelines[i]);
+                        }
+                        //alert(messagelines[i]);
+                }
+        }
+}
+
+var monopc = {
+	server: function (a) {
+		//for(e in a) console.log("monopc.server - ", e, ": ", a[e]);
+		this.version = a['version'];
+	},
+	client: function (a) {
+		this.playerid = a['playerid'];
+		this.cookie = a['cookie'];
+	},
+	players : [],
+	playerupdate: function(a) {
+		this.players[a['playerid']] = {
+			name: a['name'],
+			game: a['game']
+		};
+	},
+	deleteplayer: function (a){
+		this.players.splice(a['playerid'], 1);
+	},
+	updategamelist: function (a,c) {
+		if(this.version!='0.9.3') {  // FIXME: somehow :D
+			console.warn('DEPRECATED function updategamelist, using ', (a['type']=='del') ? 'deletegame' : 'gameupdate');
+			for(var i=0;i<c.length;i++){
+				var e = c[i];
+				var attra = [];
+				for(var k=0; k<e.attributes.length; k++) {
+					var a = e.attributes[k];
+					var name = a.nodeName;
+					if(name=='id') name = 'gameid';
+					attra[name] = a.nodeValue;
+				}
+				if(a['type']=='del') this.deletegame(attra);
+					else this.gameupdate(attra);
+			}
+		}
+	},
+	games: [],
+	gametypes: [],
+	deletegame: function (a){
+		this.games.splice(a['gameid'], 1);
+	},
+	gameupdate: function (a){
+		if(a['gameid']=='-1') {
+			this.gametypes[this.gametypes.length] = {
+				gametype: a['gametype'],
+				name: a['name'],
+				description: a['description']
+			};
+		} else {
+			this.games[a['gameid']] = {
+				gametype: a['gametype'],
+				name: a['name'],
+				description: a['description']
+			};
+		}
+	},
+	foo: 'bar'
+}
+
+function handlexml(xmlinput) {
+        //this is a dummy function for testing
+        //TODO: create a case for every Tag and design functions to handle them
+        var i,j; //loop-Variables
+        var monopdechildren; //used to avoid massuse of monopdelements[i].childNodes
+        var xmldom = xml2dom(xmlinput);
+        //xml2dom should be set dependend on the features provided by the browser
+        //if this is done correctly, xmldom contains a DOM of the given monopd-response
+
+        var monopdelements = xmldom.getElementsByTagName('monopd'); //This is for the unlikely case that the string contains more that one <monopd>-Element
+        for(i=0;i<monopdelements.length;i++){
+                monopdchildren = monopdelements[i].childNodes;
+                //We get the childNodes of a <monopd>-Element
+                for(j=0;j<monopdchildren.length;j++){
+                        //for every child of <monopd> we check its name and call the right function
+                        //console.log('monopdchild ' + monopdchildren[j].nodeName + ': ',monopdchildren[j]);
+                        //FIXME: Catch updategamelist and updateplayerlist for compatibility to older servers
+
+                        var e = monopdchildren[j];
+                        if (e.nodeName=='#text') continue; // skip emty nodes (newlines)
+						var logstr = e.nodeName + ": " + e.nodeValue;
+						var attra = []; // attribute array
+                        for(var k=0; k<e.attributes.length; k++) { // build logstr and attribute array
+							var a = e.attributes[k];
+							logstr += " | "+ a.nodeName + "=" + a.nodeValue;
+							attra[a.nodeName] = a.nodeValue;
+							//console.log("---", a.nodeName, ": ", a.nodeValue);
+						}
+						
+						console.log(logstr, e);
+						//console.log(attra);
+						if(monopc[e.nodeName]) monopc[e.nodeName](attra,e.childNodes);
+							else console.warn("FIXME: implement ", e.nodeName);
+                        /*
+                        switch(monopdchildren[j].nodeName){
+                                case "server":
+                                        console.log(
+                                                'server-element, version: ' +
+                                                monopdchildren[j].getAttribute('version') +
+                                                ' name: ' +
+                                                monopdchildren[j].getAttribute('name'),
+                                        monopdchildren[j]);
+                                        break;
+                                case "client":
+                                        console.log('client-element, playerid: ' +
+                                                monopdchildren[j].getAttribute('playerid') +
+                                                ' cookie: ' +
+                                                monopdchildren[j].getAttribute('cookie'),
+                                        monopdchildren[j]);
+                                        break;
+                                case "gameupdate":
+                                        console.log('gameupdate-element, gameid: ' +
+                                                monopdchildren[j].getAttribute('gameid') +
+                                                ' gametype: ' +
+                                                monopdchildren[j].getAttribute('gametype') +
+                                                ' name: ' +
+                                                monopdchildren[j].getAttribute('name') +
+                                                ' description: ' +
+                                                monopdchildren[j].getAttribute('description') +
+                                                ' status: ' +
+                                                monopdchildren[j].getAttribute('status') +
+                                                ' cabejoined: ' +
+                                                monopdchildren[j].getAttribute('gametype') +
+                                                ' master: ' +
+                                                monopdchildren[j].getAttribute('master') +
+                                                ' players: ' +
+                                                monopdchildren[j].getAttribute('players') +
+                                                ' minplayers: ' +
+                                                monopdchildren[j].getAttribute('minplayers') +
+                                                ' maxplayers: ' +
+                                                monopdchildren[j].getAttribute('maxplayers'),
+                                        monopdchildren[j]);
+                                        break;
+                                case "playerupdate":
+                                        console.log('playerupdate-element, playerid: ' +
+                                                monopdchildren[j].getAttribute('playerid') +
+                                                ' game: ' +
+                                                monopdchildren[j].getAttribute('game') +
+                                                ' name: ' +
+                                                monopdchildren[j].getAttribute('name') +
+                                                ' image: ' +
+                                                monopdchildren[j].getAttribute('image') +
+                                                ' money: ' +
+                                                monopdchildren[j].getAttribute('money') +
+                                                ' location: ' +
+                                                monopdchildren[j].getAttribute('location') +
+                                                ' jailed: ' +
+                                                monopdchildren[j].getAttribute('jailed') +
+                                                ' directmove: ' +
+                                                monopdchildren[j].getAttribute('directmove') +
+                                                ' bankrupt: ' +
+                                                monopdchildren[j].getAttribute('bankrupt') +
+                                                ' hasturn: ' +
+                                                monopdchildren[j].getAttribute('hasturn') +
+                                                ' can_roll: ' +
+                                                monopdchildren[j].getAttribute('can_roll') +
+                                                ' can_buyestate: ' +
+                                                monopdchildren[j].getAttribute('can_buyestate') +
+                                                ' host: ' +
+                                                monopdchildren[j].getAttribute('host') +
+                                                ' spectator: ' +
+                                                monopdchildren[j].getAttribute('spectator') +
+                                                ' hasdebt: ' +
+                                                monopdchildren[j].getAttribute('hasdebt') +
+                                                ' canauction: ' +
+                                                monopdchildren[j].getAttribute('canauction') +
+                                                ' canusecard: ' +
+                                                monopdchildren[j].getAttribute('canusecard'),
+                                        monopdchildren[j]);
+                                        break;
+                                case "deletegame":
+                                        console.log('deletegame-element, gameid: ' +
+                                                monopdchildren[j].getAttribute('gameid'),
+                                        monopdchildren[j]);
+                                        break;
+                                case "deleteplayer":
+                                        console.log('deleteplayer-element, playerid: ' +
+                                                monopdchildren[j].getAttribute('playerid'),
+                                        monopdchildren[j]);
+                                        break;
+                                case "msg":
+                                        console.log('msg-element, type: ' +
+                                                monopdchildren[j].getAttribute('type') +
+                                                ' playerid: ' +
+                                                monopdchildren[j].getAttribute('playerid') +
+                                                ' author: ' +
+                                                monopdchildren[j].getAttribute('author') +
+                                                ' value: ' +
+                                                monopdchildren[j].getAttribute('value'),
+                                        monopdchildren[j]);
+                                        break;
+                                case "#text": //catch text-nodes, poduced by whitespaces in xml
+                                        break;
+                                case "":
+                                        break;
+                                default:
+                                        console.log('FIXME: catch ' + monopdchildren[j].nodeName + ' j=' + j + ': ',  monopdchildren[j]);
+                                        break;
+                        } //switch (Tagnames)
+                        */
+
+
+                }//inner for-loop (monopdchildren)
+        }//outer for-loop (monopdelements)
+
+        var logmsg = xmlinput+"\n-------------------------------------------------------------\n";
+        $('#log').text($('#log').text() ? logmsg+$('#log').text() : xmlinput);
+        //console.log('server: ',xmlinput);
+} //function handlexml
+
+var socket = new io.connect('http://127.0.0.1:1337');
+socket.on('connect',function() {
+        console.log('Client has connected to the server!');
+});
+socket.on('message', handlemessage);
+
+
+socket.on('disconnect',function() {
+        console.log('The client has disconnected!');
+});
+function send(message) {
+        socket.send(message+"\n");
+}
+</script>
+</body>
+</html>
