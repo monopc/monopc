@@ -1,14 +1,16 @@
 if(!process.env.C9_PORT) process.env.C9_PORT = 1337;
-var io = require('socket.io').listen(process.env.C9_PORT);
+var io = require('socket.io').listen(parseInt(process.env.C9_PORT));
 io.set('log level', 1);
 //io.set('origins', '127.0.0.1:*');
 io.sockets.on('connection', function (cc) {
-	var net = require('net');
-	//var cs = net.connect(1230, 'monopd.gradator.net',  function() { //'connect' listener
+    var net = require('net');
 	var cs = net.connect(1234, 'play.psmonopoly.com',  function() { //'connect' listener
-	//var cs = net.connect(1230, '127.0.0.1',  function() { //'connect' listener
 		console.log('connected to monopd');
 	});
+    
+    //var cs = net.connect(1230, 'monopd.gradator.net',  function() { //'connect' listener
+    //var cs = net.connect(1230, '127.0.0.1',  function() { //'connect' listener
+
 	cs.on('data', function(data) {
 		console.log('monopd:', data.toString());
 		cc.send(data);
@@ -28,9 +30,5 @@ io.sockets.on('connection', function (cc) {
 		cs.write(".d\n");
 	});
 	// oh wow git pull!
+
 });
-
-
-
-
-
