@@ -1,14 +1,27 @@
-var io = require('socket.io').listen(parseInt(process.env.C9_PORT, 10));
+var app = require('http').createServer(function  (req, res) {
+	fs.readFile(__dirname + '/test.html', function (err, data) {
+		if (err) {
+			res.writeHead(500);
+			return res.end('Error loading file');
+		}
+		res.writeHead(200);
+		res.end(data);
+	});
+});
+var io = require('socket.io').listen(app);
+var fs = require('fs');
+
+app.listen(parseInt(process.env.C9_PORT, 10));
+
 io.set('log level', 1);
 //io.set('origins', '127.0.0.1:*');
 io.sockets.on('connection', function (cc) {
-    var net = require('net');
+	var net = require('net');
+	//var cs = net.connect(1230, 'monopd.gradator.net',  function() { //'connect' listener
+	//var cs = net.connect(1230, '127.0.0.1',  function() { //'connect' listener
 	var cs = net.connect(1234, 'play.psmonopoly.com',  function() { //'connect' listener
 		console.log('connected to monopd');
 	});
-    
-    //var cs = net.connect(1230, 'monopd.gradator.net',  function() { //'connect' listener
-    //var cs = net.connect(1230, '127.0.0.1',  function() { //'connect' listener
 
 	cs.on('data', function(data) {
 		console.log('monopd:', data.toString());
@@ -25,9 +38,7 @@ io.sockets.on('connection', function (cc) {
 	});
 	cc.on('disconnect',function(){
 		console.log('Client has disconnected');
-		//FIXME: hier sollte man irgendwie anders die verbindung zum monopd zu machen...
-		cs.write(".d\n");
+		//cs.write(".d\n");
+		cs.end();
 	});
-	// oh wow git pull!
-
 });
