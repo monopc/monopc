@@ -1,3 +1,4 @@
+if(!process.env.C9_PORT) process.env.C9_PORT = 1337;
 var io = require('socket.io').listen(process.env.C9_PORT);
 io.set('log level', 1);
 //io.set('origins', '127.0.0.1:*');
