@@ -26,7 +26,6 @@ io.sockets.on('connection', function (cc) {
 		//FIXME: hier sollte man irgendwie anders die verbindung zum monopd zu machen...
 		cs.write(".d\n");
 	});
-	// omg git!
 });
 
 
