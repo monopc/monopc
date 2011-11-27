@@ -11,7 +11,7 @@ var app = require('http').createServer(function  (req, res) {
 var io = require('socket.io').listen(app);
 var fs = require('fs');
 
-app.listen(parseInt(process.env.C9_PORT, 10));
+app.listen(process.env.C9_PORT || process.env.PORT || 1337);
 
 io.set('log level', 1);
 //io.set('origins', '127.0.0.1:*');
