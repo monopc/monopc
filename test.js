@@ -17,9 +17,9 @@ io.set('log level', 1);
 //io.set('origins', '127.0.0.1:*');
 io.sockets.on('connection', function (cc) {
 	var net = require('net');
-	//var cs = net.connect(1230, 'monopd.gradator.net',  function() { //'connect' listener
 	//var cs = net.connect(1230, '127.0.0.1',  function() { //'connect' listener
-	var cs = net.connect(1234, 'play.psmonopoly.com',  function() { //'connect' listener
+	//var cs = net.connect(1234, 'play.psmonopoly.com',  function() { //'connect' listener
+	var cs = net.connect(1230, 'monopd.gradator.net',  function() { //'connect' listener
 		console.log('connected to monopd');
 	});
 
