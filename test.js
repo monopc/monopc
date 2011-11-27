@@ -8,8 +8,12 @@ var app = require('http').createServer(function  (req, res) {
 		res.end(data);
 	});
 });
-var io = require('socket.io').listen(app);
 var fs = require('fs');
+var io = require('socket.io').listen(app);
+io.configure(function () { 
+  io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10); 
+});
 
 app.listen(process.env.C9_PORT || process.env.PORT || 1337);
 
