@@ -86,13 +86,17 @@ var monopc = {
 			console.warn('DEPRECATED function updategamelist, using ', (a['type']=='del') ? 'deletegame' : 'gameupdate');
 			for(var i=0;i<c.length;i++){
 				var e = c[i];
-				var attra = [];
+                var attra = parseattributes(e.attributes);
+				/*
+                var attra = [];
 				for(var k=0; k<e.attributes.length; k++) {
 					var a = e.attributes[k];
 					var name = a.nodeName;
 					if(name=='id') name = 'gameid';
 					attra[name] = a.nodeValue;
 				}
+                */
+                attra['gameid'] = attra['id'];
 				if(a['type']=='del') this.deletegame(attra);
 					else this.gameupdate(attra);
 			}
@@ -142,13 +146,7 @@ function handlexml(xmlinput) {
                         var e = monopdchildren[j];
                         if (e.nodeName=='#text') continue; // skip emty nodes (newlines)
 						var logstr = e.nodeName + ": " + e.nodeValue;
-						var attra = []; // attribute array
-                        for(var k=0; k<e.attributes.length; k++) { // build logstr and attribute array
-							var a = e.attributes[k];
-							logstr += " | "+ a.nodeName + "=" + a.nodeValue;
-							attra[a.nodeName] = a.nodeValue;
-							//console.log("---", a.nodeName, ": ", a.nodeValue);
-						}
+						var attra = parseattributes(e.attributes); // attribute array
 						
 						console.log(logstr, e);
 						//console.log(attra);
@@ -270,6 +268,15 @@ function handlexml(xmlinput) {
         $('#log').text($('#log').text() ? logmsg+$('#log').text() : xmlinput);
         //console.log('server: ',xmlinput);
 } //function handlexml
+
+function parseattributes(attributes) {
+    var attributelist = [];
+    for (var k = i; i < attributes.length; i++) { // build logstr and attribute array
+        var attribute = attributes[i];
+        attributelist[attribute.nodeName] = attribute.nodeValue;
+    }
+    return attributelist;
+}
 
 var socket = new io.connect('http://127.0.0.1:1337');
 socket.on('connect',function() {
