@@ -271,7 +271,7 @@ function handlexml(xmlinput) {
 
 function parseattributes(attributes) {
     var attributelist = [];
-    for (var k = i; i < attributes.length; i++) { // build logstr and attribute array
+    for (var i = 0; i < attributes.length; i++) { // build logstr and attribute array
         var attribute = attributes[i];
         attributelist[attribute.nodeName] = attribute.nodeValue;
     }
