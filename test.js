@@ -1,14 +1,39 @@
-var app = require('http').createServer(function  (req, res) {
-	fs.readFile(__dirname + '/test.html', function (err, data) {
-		if (err) {
-			res.writeHead(500);
-			return res.end('Error loading file');
-		}
-		res.writeHead(200);
-		res.end(data);
-	});
-});
+var http = require('http');
 var fs = require('fs');
+var path = require('path');
+
+var app = http.createServer(function (request, response) {
+	var filePath = '.' + request.url;
+	if (filePath == './') filePath = './test.html';
+
+	var extname = path.extname(filePath);
+	var contentType = 'text/html';
+	switch (extname) {
+		case '.js': contentType = 'text/javascript'; break;
+		case '.css': contentType = 'text/css'; break;
+	}
+	var files = ['./test.html', './monopgui.js', './monopc.js'];
+	var in_files = false;
+	for(var i=0; i<files.length; i++) {
+		if(files[i]==filePath) in_files = true;
+	}
+	if (in_files) {
+		fs.readFile(filePath, function(error, content) {
+			if (error) {
+				response.writeHead(500);
+				response.end('Error loading file');
+			}
+			else {
+				response.writeHead(200, { 'Content-Type': contentType });
+				response.end(content, 'utf-8');
+			}
+		});
+	} else {
+		response.writeHead(404);
+		response.end('Not found');
+	};
+});
+
 var io = require('socket.io').listen(app);
 io.configure(function () { 
   io.set("transports", ["xhr-polling"]); 
