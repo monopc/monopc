@@ -27,13 +27,13 @@ var monopc = {
 			console.log(c);
 			for(var i=0;i<c.length;i++){
 				c[i]['gameid'] = c[i]['id'];
-				if(c[i]['type']=='del') this.deletegame(c[i]);
+				if(a['type']=='del') this.deletegame(c[i]);
 					else this.gameupdate(c[i]);
 			}
 		}
 	},
 	games: [],
-	gametypes: {},
+	gametypes: [],
 	deletegame: function (a){
 		this.games.splice(a['gameid'], 1);
 		monopgui.deletegame(a['gameid']);
@@ -55,6 +55,10 @@ var monopc = {
 			};
 			monopgui.updategame(a['gameid']);
 		}
+	},
+	msg: function (a){
+		//let the gui object print the (chat(message
+		monopgui.printmessage(a['type'],a['playerid'],a['author'],a['value']);
 	},
 	foo: 'bar'
 };

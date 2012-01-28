@@ -18,5 +18,9 @@ var monopgui = {
 		//" (" + monopc.gametypes[monopc.games[id].gametype]["name"] + " " +
 		" (" +
 		monopc.games[id].players + " Players) - " + monopc.games[id].description;
+	},
+	printmessage: function(type, playerid, author, value){
+		//TODO: write something
+		//
 	}
 };
