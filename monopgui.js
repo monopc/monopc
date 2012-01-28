@@ -2,7 +2,7 @@ var monopgui = {
 	gamelist: document.getElementById("gamelist"),
 	gamelistlines: [],
 	deletegame: function (id){
-		this.gamelistlines[id].getParent().removeChild(this.gamelistlines[id]);
+		this.gamelistlines[id].parentNode().removeChild(this.gamelistlines[id]);
 		this.gamelistlines.splice(id, 1);
 	},
 	updategame: function (id){
