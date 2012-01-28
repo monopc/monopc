@@ -1,5 +1,5 @@
 var monopgui = {
-	gamelist: document.getElementById("gameslist"),
+	gamelist: document.getElementById("gamelist"),
 	gamelistlines: [],
 	deletegame: function (id){
 		this.gamelistlines[id].getParent().removeChild(this.gamelistlines[id]);
