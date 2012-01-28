@@ -64,19 +64,22 @@ function handlemessage(data) {
 
 var monopc = {
 	server: function (a) {
+		//monopd-0.9.3-Docu: Handshake, First-Way
 		//for(e in a) console.log("monopc.server - ", e, ": ", a[e]);
 		this.version = a['version'];
+		//After that Point we sould login the user by sending the .n-command
 	},
 	client: function (a) {
-		this.playerid = a['playerid'];
-		this.cookie = a['cookie'];
+		//monopd-0.9.3-Docu: any data has to be sent after this handshake
+		this.playerid = a['playerid']; //The ID of this player
+		this.cookie = a['cookie']; //THe Cookie for reconnects
 	},
 	players : [],
 	playerupdate: function(a) {
 		this.players[a['playerid']] = {
 			name: a['name'],
 			game: a['game']
-		};
+		}; //We genrate a list players, keys are the IDs, game=-1 means not in a game
 	},
 	deleteplayer: function (a){
 		this.players.splice(a['playerid'], 1);
