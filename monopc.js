@@ -33,7 +33,7 @@ var monopc = {
 		}
 	},
 	games: [],
-	gametypes: [],
+	gametypes: {},
 	deletegame: function (a){
 		this.games.splice(a['gameid'], 1);
 		monopgui.deletegame(a['gameid']);
