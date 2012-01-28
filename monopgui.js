@@ -1,4 +1,5 @@
 var monopgui = {
+	chatbox: document.getElementById("chatbox"),
 	gamelist: document.getElementById("gamelist"),
 	gamelistlines: [],
 	deletegame: function (id){
@@ -21,6 +22,10 @@ var monopgui = {
 	},
 	printmessage: function(type, playerid, author, value){
 		//TODO: write something
-		//
+		if (type == "chat"){
+			chatbox.innerHTML = "<p>&lt;" + author +  "&gt;" + value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") + "</p>" + chatbox.innerHTML;
+		}else{
+			chatbox.innerHTML = "<p><b>" + type +  "</b>" + value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") + "</p>" + chatbox.innerHTML;
+		}
 	}
 };
