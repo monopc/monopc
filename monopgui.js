@@ -15,7 +15,8 @@ var monopgui = {
 			this.gamelist.appendChild(this.gamelistlines[id]);
 		}
 		this.gamelistlines[id].innerHTML = monopc.games[id].name +
-		" (" + monopc.gametypes[monopc.games[id].gametype]["name"] + " " +
+		//" (" + monopc.gametypes[monopc.games[id].gametype]["name"] + " " +
+		" (" +
 		monopc.games[id].players + " Players) - " + monopc.games[id].description;
 	}
 };
