@@ -53,6 +53,7 @@ var monopc = {
 				description: a['description'],
 				players: a['players']
 			};
+			monopgui.updategame(a['gameid']);
 		}
 	},
 	foo: 'bar'
