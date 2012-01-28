@@ -36,11 +36,13 @@ var monopc = {
 	gametypes: [],
 	deletegame: function (a){
 		this.games.splice(a['gameid'], 1);
+		monopgui.deletegame(a['gameid']);
 	},
 	gameupdate: function (a){
 		if(a['gameid']=='-1') {
-			this.gametypes[this.gametypes.length] = {
-				gametype: a['gametype'],
+			//this.gametypes[this.gametypes.length] = {
+			this.gametypes[a['gametype']] = {
+				//gametype: a['gametype'],
 				name: a['name'],
 				description: a['description']
 			};
@@ -48,9 +50,10 @@ var monopc = {
 			this.games[a['gameid']] = {
 				gametype: a['gametype'],
 				name: a['name'],
-				description: a['description']
+				description: a['description'],
+				players: a['players']
 			};
 		}
 	},
 	foo: 'bar'
-}
+};
