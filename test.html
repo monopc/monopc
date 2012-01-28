@@ -102,11 +102,19 @@ var monopc = {
 	},
 	gameupdate: function (a){
 		if(a['gameid']=='-1') {
-			this.gametypes[this.gametypes.length] = {
-				gametype: a['gametype'],
-				name: a['name'],
-				description: a['description']
-			};
+			var newgametype = true;
+			for(var i=0; i<this.gametypes.length; i++) {
+				if(this.gametypes[i]['gametype']==a['gametype']) {
+					newgametype = false;
+				}
+			}
+			if(newgametype) {
+				this.gametypes[this.gametypes.length] = {
+					gametype: a['gametype'],
+					name: a['name'],
+					description: a['description']
+				};
+			}
 		} else {
 			this.games[a['gameid']] = {
 				gametype: a['gametype'],
