@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head><title></title></head>
+<head>
+	<title></title>
+	<link type="text/css" rel="stylesheet" href="./style.css" />
+	<script src="./socket.io/socket.io.js"></script>
+	<script src="http://code.jquery.com/jquery-1.7.min.js"></script>
+	<script src="./monopc.js"></script>
+	<script src="./monopgui.js"></script>
+</head>
 <body>
 <h2>Gamelist</h2>
 <ul id="gamelist">
 
 </ul>
 <h2>Chatbox</h2>
-<div id="chatbox"></div>
+<div id="msgs">
+	<div id="chatbox"></div>
+	<div id="errorbox"></div>
+	<div style="clear:both"></div>
+</div>
 <a href="http://src.gnu-darwin.org/ports/games/monopd/work/monopd-0.9.3/API">http://src.gnu-darwin.org/ports/games/monopd/work/monopd-0.9.3/API</a>
 <form id="foo">
 	<input type="text" id="q" name="fooq" />
@@ -15,10 +26,6 @@
 </form>
 <pre id="log"></pre>
 
-<script src="./socket.io/socket.io.js"></script>
-<script src="http://code.jquery.com/jquery-1.7.min.js"></script>
-<script src="./monopc.js"></script>
-<script src="./monopgui.js"></script>
 <script>
 document.getElementById("foo").onsubmit = function() {
 	send(document.getElementById("q").value);

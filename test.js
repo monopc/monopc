@@ -12,7 +12,7 @@ var app = http.createServer(function (request, response) {
 		case '.js': contentType = 'text/javascript'; break;
 		case '.css': contentType = 'text/css'; break;
 	}
-	var files = ['./test.html', './monopgui.js', './monopc.js'];
+	var files = ['./test.html', './monopgui.js', './monopc.js', './style.css'];
 	var in_files = false;
 	for(var i=0; i<files.length; i++) {
 		if(files[i]==filePath) in_files = true;

@@ -1,0 +1,28 @@
+
+p {
+	margin: 0;
+	padding: 0;
+}
+h2 {
+	padding: 0;
+	margin: 0;
+}
+
+#msgs {
+	background: #fff;
+}
+
+#chatbox {
+	float:left;
+	width: 50%;
+	background: #eee;
+	height: 150px;
+	overflow: auto;
+}
+#errorbox {
+	float: right;
+	width: 50%;
+	background: #ccc;
+	height: 150px;
+	overflow: auto;
+}
