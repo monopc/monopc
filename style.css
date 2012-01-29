@@ -26,3 +26,9 @@ h2 {
 	height: 150px;
 	overflow: auto;
 }
+
+#log {
+	background: #eee;
+	height: 300px;
+	overflow: auto; 
+}
