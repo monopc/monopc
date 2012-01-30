@@ -36,6 +36,7 @@ var app = http.createServer(function (request, response) {
 		    var content = 'stdout: \n' + stdout + '\n'+
 						  'stderr: \n' + stderr + '\n' +
 					      'exec error: \n' + error;
+			console.log('--- git pull ---');
 			response.end(content, 'utf-8');
 		});
 	} else {
