@@ -24,9 +24,9 @@ var monopgui = {
 	printmessage: function(type, playerid, author, value){
 		//TODO: write something
 		if (type == "chat"){
-			chatbox.innerHTML = "<p>&lt;" + author +  "&gt; " + value + "</p>" + chatbox.innerHTML;
+			this.chatbox.innerHTML = "<p>&lt;" + author +  "&gt; " + value + "</p>" + this.chatbox.innerHTML;
 		}else{
-			errorbox.innerHTML = "<p><b>" + type +  "</b> " + value + "</p>" + errorbox.innerHTML;
+			this.errorbox.innerHTML = "<p><b>" + type +  "</b> " + value + "</p>" + this.errorbox.innerHTML;
 		}
 	}
 };
