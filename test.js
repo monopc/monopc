@@ -33,10 +33,10 @@ var app = http.createServer(function (request, response) {
 		var exec  = require('child_process').exec;		
 		exec('git pull', function (error, stdout, stderr) {
 			response.writeHead(200, { 'Content-Type': 'text/plain' });
-			response.end(content, 'utf-8');
 		    var content = 'stdout: \n' + stdout + '\n'+
 						  'stderr: \n' + stderr + '\n' +
 					      'exec error: \n' + error;
+			response.end(content, 'utf-8');
 		});
 	} else {
 		response.writeHead(404);
