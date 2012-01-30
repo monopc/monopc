@@ -28,10 +28,20 @@ var app = http.createServer(function (request, response) {
 				response.end(content, 'utf-8');
 			}
 		});
+	} else if (filePath=='./update') {
+		require('util');
+		var exec  = require('child_process').exec;		
+		exec('git pull', function (error, stdout, stderr) {
+			response.writeHead(200, { 'Content-Type': 'text/plain' });
+			response.end(content, 'utf-8');
+		    var content = 'stdout: \n' + stdout + '\n'+
+						  'stderr: \n' + stderr + '\n' +
+					      'exec error: \n' + error;
+		});
 	} else {
 		response.writeHead(404);
 		response.end('Not found');
-	};
+	}
 });
 
 var io = require('socket.io').listen(app);
