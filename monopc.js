@@ -1,28 +1,36 @@
+var monopc = new Monopc();
+function Monopc(){
+	if ( !(this instanceof arguments.callee) ) {
+		return new Monopc();
+	}
 
-var monopc = {
-	server: function (a) {
+	this.server = function (a) {
 		//monopd-0.9.3-Docu: Handshake, First-Way
-		//for(e in a) console.log("monopc.server - ", e, ": ", a[e]);
-		this.version = a['version'];
+		this.serverversion = a['version'];
 		//After that Point we sould login the user by sending the .n-command
-	},
-	client: function (a) {
-		//monopd-0.9.3-Docu: any data has to be sent after this handshake
+	};
+	this.client = function (a) { //monopd-0.9.3-Docu: any data has to be sent after this handshake
 		this.playerid = a['playerid']; //The ID of this player
-		this.cookie = a['cookie']; //THe Cookie for reconnects
-	},
-	players : [],
-	playerupdate: function(a) {
-		this.players[a['playerid']] = {
-			name: a['name'],
-			game: a['game']
-		}; //We genrate a list players, keys are the IDs, game=-1 means not in a game
-	},
-	deleteplayer: function (a){
-		this.players.splice(a['playerid'], 1);
-	},
-	updategamelist: function (a,c) {
-		if(this.version!='0.9.3') {  // FIXME: somehow :D
+		this.cookie = a['cookie']; //The Cookie for reconnects
+	};
+
+	this.players = {};
+	this.playerupdate = function (a) { setattr(this.players, 'playerid', a) };
+	this.deleteplayer = function (a) {
+		delete this.players[a['playerid']];
+	};
+	this.updateplayerlist = function(a) {
+		if( a['type']=='full') {
+			for(var e in this.players) {
+				this.deleteplayer({playerid: e});
+			}
+		} else {
+			console.warn('DEPRECATED function updateplayerlist, implemet it better!');
+		};
+	};
+
+	this.updategamelist = function (a,c) {
+		if(this.serverversion!='0.9.3') {  // FIXME: somehow :D
 			console.warn('DEPRECATED function updategamelist, using ', (a['type']=='del') ? 'deletegame' : 'gameupdate');
 			console.log(c);
 			for(var i=0;i<c.length;i++){
@@ -31,34 +39,38 @@ var monopc = {
 					else this.gameupdate(c[i]);
 			}
 		}
-	},
-	games: [],
-	gametypes: [],
-	deletegame: function (a){
-		this.games.splice(a['gameid'], 1);
+	};
+	this.games = {};
+	this.gametypes = {};
+	this.deletegame = function (a){
+		delete this.games[a['gameid']];
 		monopgui.deletegame(a['gameid']);
-	},
-	gameupdate: function (a){
+	};
+	this.gameupdate = function (a){
 		if(a['gameid']=='-1') {
-			//this.gametypes[this.gametypes.length] = {
-			this.gametypes[a['gametype']] = {
-				//gametype: a['gametype'],
-				name: a['name'],
-				description: a['description']
-			};
+			setattr(this.games, 'gametype', a);
 		} else {
-			this.games[a['gameid']] = {
-				gametype: a['gametype'],
-				name: a['name'],
-				description: a['description'],
-				players: a['players']
-			};
+			setattr(this.games, 'gameid', a);
 			monopgui.updategame(a['gameid']);
 		}
-	},
-	msg: function (a){
+	};
+
+	this.estates = {};
+	this.estateupdate = function(a) { setattr(this.estates, 'estateid', a) };
+
+	this.msg = function (a){
 		//let the gui object print the (chat(message
 		monopgui.printmessage(a['type'],a['playerid'],a['author'],a['value']);
-	},
-	foo: 'bar'
+	};
+	//var setattr = this.setattr;
+	setattr = function(obj,key,data) {
+		for(e in data) {
+			//console.log(obj,key,data,e,data[key],data[e]);
+			if(!obj[data[key]]) obj[data[key]] = {};
+			obj[data[key]][e] = data[e];
+		}
+		/* } else {
+			return (function(data) {obj[data[key]] = data});  // <3
+		}*/
+	};
 };
