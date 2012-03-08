@@ -15,7 +15,7 @@ function Monopc(){
 	};
 
 	this.players = {};
-	this.playerupdate = function (a) { setattr(this.players, 'playerid', a) };
+	this.playerupdate = function (a) { this.setattr(this.players, 'playerid', a); };
 	this.deleteplayer = function (a) {
 		delete this.players[a['playerid']];
 	};
@@ -26,7 +26,7 @@ function Monopc(){
 			}
 		} else {
 			console.warn('DEPRECATED function updateplayerlist, implemet it better!');
-		};
+		}
 	};
 
 	this.updategamelist = function (a,c) {
@@ -48,23 +48,23 @@ function Monopc(){
 	};
 	this.gameupdate = function (a){
 		if(a['gameid']=='-1') {
-			setattr(this.games, 'gametype', a);
+			this.setattr(this.games, 'gametype', a);
 		} else {
-			setattr(this.games, 'gameid', a);
+			this.setattr(this.games, 'gameid', a);
 			monopgui.updategame(a['gameid']);
 		}
 	};
 
 	this.estates = {};
-	this.estateupdate = function(a) { setattr(this.estates, 'estateid', a) };
+	this.estateupdate = function(a) { this.setattr(this.estates, 'estateid', a) };
 
 	this.msg = function (a){
 		//let the gui object print the (chat(message
 		monopgui.printmessage(a['type'],a['playerid'],a['author'],a['value']);
 	};
 	//var setattr = this.setattr;
-	setattr = function(obj,key,data) {
-		for(e in data) {
+	this.setattr = function(obj,key,data) {
+		for(var e in data) {
 			//console.log(obj,key,data,e,data[key],data[e]);
 			if(!obj[data[key]]) obj[data[key]] = {};
 			obj[data[key]][e] = data[e];
@@ -73,4 +73,4 @@ function Monopc(){
 			return (function(data) {obj[data[key]] = data});  // <3
 		}*/
 	};
-};
+}
