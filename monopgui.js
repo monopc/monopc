@@ -9,7 +9,7 @@ var monopgui = {
 	},
 	updategame: function (id){
 		//Find out whether the <li> already exists
-		if (this.gamelistlines[id] !== null){
+		if (this.gamelistlines[id] !== undefined){
 			//the <li> exists
 		}else{
 			//the <li> doesn't exist and has to be created
