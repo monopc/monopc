@@ -1,7 +1,7 @@
 var monopgui = new Monopgui();
-function Monogui(){
+function Monopgui(){
 	if ( !(this instanceof arguments.callee) ) {
-		return new Monogui();
+		return new Monopgui();
 	}
 	
 	this.chatbox = document.getElementById("chatbox");
