@@ -4,7 +4,7 @@
 	<title></title>
 	<link type="text/css" rel="stylesheet" href="./style.css" />
 	<script src="./socket.io/socket.io.js"></script>
-	<script src="http://code.jquery.com/jquery-1.7.min.js"></script>
+	<!--<script src="http://code.jquery.com/jquery-1.7.min.js"></script>-->
 </head>
 <body>
 <h2>Gamelist</h2>
@@ -214,9 +214,12 @@ function handlexml(xmlinput) {
 		}//inner for-loop (monopdchildren)
 	}//outer for-loop (monopdelements)
 
-	var logmsg = xmlinput+"\n-------------------------------------------------------------\n";
-		//FIXME: asugabe ohne jquery
-	$('#log').text($('#log').text() ? logmsg+$('#log').text() : xmlinput);
+	xmlinput = specialchars(xmlinput);
+	var logmsg = xmlinput+"<br />-------------------------------------------------------------<br />";
+	//FIXME: asugabe ohne jquery
+	//$('#log').text($('#log').text() ? logmsg+$('#log').text() : xmlinput);
+	var logelement = document.getElementById("log");
+	logelement.innerHTML = (logelement.innerHTML != "") ? logmsg+logelement.innerHTML : xmlinput;
 } //function handlexml
 
 function parseattributes(attributes) {
@@ -247,6 +250,17 @@ socket.on('disconnect',function() {
 });
 function send(message) {
 	socket.send(message+"\n");
+}
+
+function specialchars(inputstring){
+	//replaces Chars that would break html from a string to write it to innerHtml
+	//Better way: use  document.createTextNode();
+	return inputstring
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
 }
 </script>
 <script src="./monopc.js"></script>
