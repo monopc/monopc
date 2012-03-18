@@ -15,7 +15,13 @@ function Monopc(){
 	};
 
 	this.players = {};
-	this.playerupdate = function (a) { this.setattr(this.players, 'playerid', a); };
+	this.playerupdate = function (a) {
+		this.setattr(this.players, 'playerid', a);
+		if(a.playerid == this.playerid && a.can_roll == "1" && this.autoroll ) {
+			//Secret auoroll-Cheat: When autoroll is set to true, the client rolls automatically (when possible)
+			send(".r");
+		}
+	};
 	this.deleteplayer = function (a) {
 		delete this.players[a['playerid']];
 	};
@@ -73,4 +79,5 @@ function Monopc(){
 			return (function(data) {obj[data[key]] = data});  // <3
 		}*/
 	};
+	this.autoroll = false;
 }
